@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "eatsmart-group",
+    "staging": "eatsmart-group"
+  }
+}
