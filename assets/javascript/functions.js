@@ -61,26 +61,24 @@ function authStateObserver(user) {
     signInButtonElement.addClass('hidden');
     console.log(user.uid);
     // create firebase database for each user
-    var userdb = firebase.database().ref(`/favs_${user.uid}/`)
+    var userdb = firebase.database().ref(`/favs_${user.uid}/`);
 
-    $("#left").html(`  <button id="Pesto-Shredded-Chicken-Stuffed-Mushrooms-2468837">Favorite</button>
+    $('#left')
+      .html(`  <button id="Pesto-Shredded-Chicken-Stuffed-Mushrooms-2468837">Favorite</button>
     <button id="add-calendar">Add to Calendar</button>
-    `)
+    `);
 
     $('button').on('click', function() {
-      console.log($(this)[0].id)
+      console.log($(this)[0].id);
       var recipe = $(this)[0].id;
-      console.log('recipe:'+recipe)
+      console.log('recipe:' + recipe);
       userdb.push({ recipe });
     });
     // We save the Firebase Messaging Device token and enable notifications.
     // saveMessagingDeviceToken();
 
-// add to calendar
-$("#add-calendar").on("click", function(){
-  
-})
-
+    // add to calendar
+    $('#add-calendar').on('click', function() {});
   } else {
     // User is signed out!
     // Hide user's profile and sign-out button.
@@ -92,7 +90,7 @@ $("#add-calendar").on("click", function(){
     signInButtonElement.removeClass('hidden');
     console.log(user);
 
-    $("#left").html('')
+    $('#left').html('');
   }
 }
 

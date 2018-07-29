@@ -81,11 +81,48 @@
   <div class="container">
     <div class="row">
       <div class="col s3">
-        Selected Recipe
-        <div id="left"></div>
+
+        <div id="recipeList" style="padding-top: 1rem; overflow: auto;max-height: 100vh;"></div>
+
       </div>
-      <div class="col s6">Results</div>
-      <div class="col s3">Daily calendar
+      <div class="col s6">
+
+        <!-- enter dish -->
+        <div class="input-field">
+          <i class="material-icons prefix">mode_edit</i>
+          <textarea id="meal" class="materialize-textarea"></textarea>
+          <label for="meal">Enter dish: </label>
+        </div>
+
+        <!-- select allergies -->
+        <div class="input-field">
+          <select multiple id="allergy">
+            <option value="" disabled selected>Choose your allergy</option>
+            <option value="393^Gluten-Free">Gluten Free</option>
+            <option value="394^Peanut-Free">Peanut Free</option>
+            <option value="398^Seafood-Free">Seafood Free</option>
+            <option value="399^Sesame-Free">Sesame Free</option>
+            <option value="400^Soy-Free">Soy Free</option>
+            <option value="396^Dairy-Free">Dairy Free</option>
+            <option value="397^Egg-Free">Egg Free</option>
+            <option value="401^Sulfite-Free">Sulfite Free</option>
+            <option value="395^Tree Nut-Free">Tree Nut-Free</option>
+            <option value="392^Wheat-Free">Wheat-Free</option>
+          </select>
+          <label>Allergies?</label>
+        </div>
+
+        <!-- Search recipe -->
+        <button class="btn waves-effect waves-light" type="submit" name="action" id="submit">Submit
+          <i class="material-icons right">send</i>
+        </button>
+
+        <hr>
+
+
+
+      </div>
+      <div class="col s3">
 
         <!-- Breakfast -->
         <table>
@@ -96,37 +133,36 @@
           </tbody>
         </table>
 
-                <!-- Lunch -->
-                <table>
-                    <thead>
-                      <th>Lunch</th>
-                    </thead>
-                    <tbody id="lunch">
-                    </tbody>
-                  </table>
-
-                          <!-- Main -->
+        <!-- Lunch -->
         <table>
-            <thead>
-              <th>Dinner</th>
-            </thead>
-            <tbody id="dinner">
-            </tbody>
-          </table>
+          <thead>
+            <th>Lunch</th>
+          </thead>
+          <tbody id="lunch">
+          </tbody>
+        </table>
+
+        <!-- Main -->
+        <table>
+          <thead>
+            <th>Dinner</th>
+          </thead>
+          <tbody id="dinner">
+          </tbody>
+        </table>
 
         <!-- Snacks -->
         <table>
-            <thead>
-              <th>Snacks</th>
-            </thead>
-            <tbody id="snacks">
-            </tbody>
-          </table>
+          <thead>
+            <th>Snacks</th>
+          </thead>
+          <tbody id="snacks">
+          </tbody>
+        </table>
 
       </div>
     </div>
   </div>
-
 
   <!-- jQuery CDN -->
   <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
@@ -147,6 +183,8 @@
 
   <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
   <script>
+    $('.carousel').carousel();
+
     // Initialize Firebase
     var config = {
       apiKey: "AIzaSyBHDCWBQo0xRH-To2V5bfxNdBKU0FNuffs",
@@ -167,6 +205,103 @@
 
     signInButtonElement.on("click", signIn)
     signOutButtonElement.on("click", signOut)
+
+  </script>
+  <script>
+    //  add images functions
+    function addImages(course, recipe) {
+      // image = $('<img>')
+      // image.attr('src', recipe.smallImageUrls);
+      // image.attr('id', recipe.id);
+
+      var recipeDiv = $("<div>")
+      recipeDiv.addClass("card horizontal")
+      recipeDiv.html(`
+      <div class="card-stacked">
+        <div class="card-content">
+            <img id=${recipe.id} class="recipe" src=${recipe.smallImageUrls}>
+          <p>${recipe.id}</p>
+        </div>
+        <div class="card-action">
+          <a href="#">Get recipe!</a>
+        </div>
+      </div>`)
+
+      $("#recipeList").append(recipeDiv)
+    }
+
+
+
+    $('select').formSelect();
+
+    $("#submit").on("click", function (e) {
+      event.preventDefault();
+      var searchPhrase = $("#meal").val()
+      var allergies = $("#allergy").val()
+      var diets = $("#diet").val()
+      var cuisines = $("#cuisine").val()
+      var courses = $("#course").val()
+      var holidays = $("#holiday").val()
+      var time = parseInt($("#time").val()) * 60
+      console.log(time)
+
+      var requiredPictures = true;
+      var url = `http://api.yummly.com/v1/api/recipes?_app_id=6fe80130&_app_key=e47479bfbd3e29b4ddd5ceb95d60916f&q=${searchPhrase.replace(' ', '+')}&requirePictures=true${allergies.map(allergy => {
+        return '&allowedAllergy[]=' + allergy
+      }).join('')}`
+      console.log(url)
+
+
+      async function getRecipes() {
+        const result = await $.ajax({
+          url: url,
+          method: 'GET'
+        })
+
+        return result
+      }
+
+      getRecipes().then(res => {
+        $("#recipeList").empty()
+        console.log(res);
+        for (var i = 1; i < res.matches.length; i++) {
+          var image;
+          if (res.matches[i].attributes.course !== undefined) {
+            // console.log(res.matches[i].attributes.course);
+            addImages(res.matches[i].attributes.course[0], res.matches[i])
+          }
+        }
+
+      }).catch(err => {
+        console.log(err)
+      })
+    })
+
+    // function cleanResults(result) {
+    //   for (let i = 0; i < result.length; i++) {
+    //     console.log(result[i])
+    //     console.log(recipeRetriever(result[i]))
+    //     result[i].sourceUrl = recipeRetriever(result[i])
+    //     console.log(result[i].sourceUrl)
+    //   }
+    //   return result
+    // }
+
+    // async function recipeRetriever(recipe) {
+    //   return await $.ajax({
+    //     url: "http://api.yummly.com/v1/api/recipe/" + recipe.id + "?_app_id=6fe80130&_app_key=e47479bfbd3e29b4ddd5ceb95d60916f",
+    //     method: 'GET'
+    //   }).then(res => {
+    //     return res.source.sourceRecipeUrl
+    //   })
+    // }
+
+    // var database = firebase.database()
+    // $("#button").on("click", function () {
+    //   firebase.database().ref('/favs/').push({
+    //     recipe: id
+    //   })
+    // })
 
   </script>
 </body>
