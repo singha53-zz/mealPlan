@@ -119,7 +119,10 @@
 
         <hr>
 
+        <div id="recipeContent" style="min-height: 70vh"></div>
+<div id="recipeButtons">
 
+</div>
 
       </div>
       <div class="col s3">
@@ -219,11 +222,8 @@
       recipeDiv.html(`
       <div class="card-stacked">
         <div class="card-content">
-            <img id=${recipe.id} class="recipe" src=${recipe.smallImageUrls}>
-          <p>${recipe.id}</p>
-        </div>
-        <div class="card-action">
-          <a href="#">Get recipe!</a>
+            <img id=${recipe.id} src=${recipe.smallImageUrls}>
+            <a class="recipe">${recipe.id.split('-').slice(0,-1).join(' ')}</a>
         </div>
       </div>`)
 
@@ -243,7 +243,6 @@
       var courses = $("#course").val()
       var holidays = $("#holiday").val()
       var time = parseInt($("#time").val()) * 60
-      console.log(time)
 
       var requiredPictures = true;
       var url = `http://api.yummly.com/v1/api/recipes?_app_id=6fe80130&_app_key=e47479bfbd3e29b4ddd5ceb95d60916f&q=${searchPhrase.replace(' ', '+')}&requirePictures=true${allergies.map(allergy => {
@@ -277,31 +276,22 @@
       })
     })
 
-    // function cleanResults(result) {
-    //   for (let i = 0; i < result.length; i++) {
-    //     console.log(result[i])
-    //     console.log(recipeRetriever(result[i]))
-    //     result[i].sourceUrl = recipeRetriever(result[i])
-    //     console.log(result[i].sourceUrl)
-    //   }
-    //   return result
-    // }
 
-    // async function recipeRetriever(recipe) {
-    //   return await $.ajax({
-    //     url: "http://api.yummly.com/v1/api/recipe/" + recipe.id + "?_app_id=6fe80130&_app_key=e47479bfbd3e29b4ddd5ceb95d60916f",
-    //     method: 'GET'
-    //   }).then(res => {
-    //     return res.source.sourceRecipeUrl
-    //   })
-    // }
+// Get recipe link
+$(document).on("click", ".recipe", function(event){
+  console.log("get recipe")
 
-    // var database = firebase.database()
-    // $("#button").on("click", function () {
-    //   firebase.database().ref('/favs/').push({
-    //     recipe: id
-    //   })
-    // })
+$("#recipeButtons").html(`        <button class="btn waves-effect waves-light" type="submit" name="action" id="submit">
+          <i class="material-icons right">thumb_up</i>
+        </button>
+        <button class="btn waves-effect waves-light" type="submit" name="action" id="submit">Get Recipe!
+          <i class="material-icons right">send</i>
+        </button>
+        <button class="btn waves-effect waves-light" type="submit" name="action" id="submit">Add to meal plan
+          <i class="material-icons right">send</i>
+        </button>`)
+  
+})
 
   </script>
 </body>
